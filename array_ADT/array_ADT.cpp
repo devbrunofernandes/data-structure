@@ -4,7 +4,7 @@
 // representing a abstract data type of array in C syntax
 struct Array
 {
-    int *A;     // pointer to array element
+    int A[10];  // pointer to array element
     int size;   // full size of the array
     int length; // used space in array
 };
@@ -18,21 +18,7 @@ void display(struct Array arr)
 
 int main()
 {
-    struct Array arr;
-    printf("Enter size of array: ");
-    scanf("%d", &arr.size);
-
-    arr.A = (int *)malloc(arr.size * sizeof(int));
-    arr.length = 0;
-
-    int n;
-    printf("Enter number of numbers: ");
-    scanf("%d", &n);
-
-    printf("Enter all elements:\n");
-    for (int i = 0; i < n; i++)
-        scanf("%d", &arr.A[i]);
-    arr.length = n;
+    struct Array arr = {{2, 4, 6, 8, 10}, 10, 5};
 
     display(arr);
 

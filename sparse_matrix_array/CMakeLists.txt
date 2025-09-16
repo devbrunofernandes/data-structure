@@ -1,1 +1,0 @@
-add_executable(sparse_matrix_array sparce_matrix.cpp)

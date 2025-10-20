@@ -62,7 +62,7 @@ public:
 
     T dequeue()
     {
-        T x = -1;
+        T x = NULL;
 
         if(isEmpty())
             cout << "Queue is empty" << endl;

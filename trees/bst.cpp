@@ -124,11 +124,11 @@ struct Node* recursive_delete(struct Node *p, const int key) {
         struct Node *q = NULL;
 
         if(height(p->left) > height(p->right)) {
-            q = find_inorder_predecessor(p->left);
+            q = find_inorder_predecessor(p);
             p->value = q->value;
             p->left = recursive_delete(p->left, q->value);
         } else {
-            q = find_inorder_successor(p->right);
+            q = find_inorder_successor(p);
             p->value = q->value;
             p->right = recursive_delete(p->right, q->value);
         }

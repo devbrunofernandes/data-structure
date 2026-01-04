@@ -1,22 +1,29 @@
-#include <exception>
 #include <iostream>
 #include <queue>
 
+#define KEYS 3
+#define MIN_KEYS (KEYS / 2)
+#define CHILDS (KEYS + 1)
+
 struct Node {
-    bool hasVal2;
-    Node* left;
-    Node* middle;
-    Node* right;
-    int val1;
-    int val2;
+    int keys[KEYS];
+    Node* childs[CHILDS];
+    int usedKeys;
 
-    Node(int key) : val1(key), hasVal2(false), left(nullptr), middle(nullptr), right(nullptr) {}
-};
+    Node() {
+        for (int i = 0; i < CHILDS; i++) {childs[i] = nullptr;}
+        for (int i = 0; i < KEYS; i++) {keys[i] = 0;}
 
-struct Promotion {
-    int promotionKey;
-    Node* newNode;
-    bool happened;
+        usedKeys = 0;
+    }
+
+    Node(int key) {
+        for (int i = 0; i < CHILDS; i++) {childs[i] = nullptr;}
+        for (int i = 0; i < KEYS; i++) {keys[i] = 0;}
+
+        keys[0] = key;
+        usedKeys = 1;
+    }
 };
 
 struct Empty {
@@ -29,154 +36,133 @@ struct Successor {
     Node* subtree;
 };
 
-bool hasSons(Node* root) {
-    return root->left || root->middle || root->right;
+bool isLeaf(Node* root) {
+    if (!root) {return false;}
+
+    if (root->childs[0])
+        return false;
+
+    return true;
+}
+
+int findIndex(const int array[], const int size, const int key) {
+    int left = 0;
+    int right = size - 1;
+    int mid;
+
+    while (left <= right) {
+        mid = ((right - left) / 2) + left;
+
+        if (array[mid] == key) {
+            return mid;
+        } else if (array[mid] < key) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return left;
+}
+
+bool search(Node* root, const int key) {
+    while (root) {
+        int index = findIndex(root->keys, root->usedKeys, key);
+        
+        if (index < root->usedKeys && root->keys[index] == key) 
+            return true;
+
+        root = root->childs[index];
+    }
+
+    return false;
 }
 
 Node* findNext(Node* root, const int key) {
-    Node* targetChild = nullptr;
+    int index = findIndex(root->keys, root->usedKeys, key);
 
-    if (key < root->val1) {
-        targetChild = root->left;
-    } else if (key > root->val1) {
-        if (root->hasVal2) {
-            if (key > root->val2) {
-                targetChild = root->right;    
-            } else if (key < root->val2) {
-                targetChild = root->middle;
-            }
-        } else {
-            targetChild = root->right;
-        }
-    }
+    Node* targetChild = root->childs[index];
 
     return targetChild;
 }
 
-bool insertInNode(Node* root, const int key) {
-    if (!root->hasVal2) {
-        if (root->val1 < key) {
-            root->val2 = key;
-        } else if (root->val1 > key) {
-            int tmp = root->val1;
-            root->val1 = key;
-            root->val2 = tmp;
-        } else {
-            throw std::exception();
-        }
+bool isFull(Node* root) {
+    if (root->usedKeys == KEYS) return true;
 
-        root->hasVal2 = true;
-        return true;
-    } else {
-        return false;
+    return false;
+}
+
+void insertCombined(Node* node, const int key, Node* child) {
+    int i = node->usedKeys - 1;
+
+    while (i >= 0 && key < node->keys[i]) {
+        node->keys[i + 1] = node->keys[i];
+        node->childs[i + 2] = node->childs[i + 1];
+        i--;
+    }
+
+    node->keys[i + 1] = key;
+    node->childs[i + 2] = child;
+    node->usedKeys++;
+}
+
+void cleanNodeGarbage(Node* node) {
+    for (int i = node->usedKeys; i < KEYS; i++) {
+        node->keys[i] = 0;
+        node->childs[i + 1] = nullptr;
     }
 }
 
-void alocateMiddleNode(Node* root, Node* child) {
-    int childValue = child->val1;
-    
-    if (childValue < root->right->val1) {
-        root->middle = child;
-    } else {
-        root->middle = root->right;
-        root->right = child;
-    }
-}
+void split(Node* node, Node* child) {
+    Node* newNode = new Node();
+    int mid = child->usedKeys / 2;
 
-Promotion split(Node* node, const int key) {
-    Node* newNode;
-    int promotionKey;
+    newNode->childs[0] = child->childs[mid + 1];
 
-    int minor = node->val1;
-    int greater = node->val2;
-    node->hasVal2 = false;
-
-    if (key < minor) {
-        node->val1 = key;
-        promotionKey = minor;
-        newNode = new Node(greater);
-    } else if (key > minor && key < greater) {
-        node->val1 = minor;
-        promotionKey = key;
-        newNode = new Node(greater);
-    } else {
-        node->val1 = minor;
-        promotionKey = greater;
-        newNode = new Node(key);
+    for (int i = mid + 1; i < child->usedKeys; i++) {
+        int index = i - mid - 1;
+        newNode->keys[index] = child->keys[i];
+        newNode->childs[index + 1] = child->childs[i + 1];
+        newNode->usedKeys++; 
     }
 
-    return {promotionKey, newNode, true};
-}
+    cleanNodeGarbage(child);
 
-Promotion insertHelper(Node* root, const int key) {
-    if (!hasSons(root)) {
-        if (!insertInNode(root, key)) {
-            return split(root, key);
-        }
+    child->usedKeys = mid;
 
-        return {0, nullptr, false};
-    }
-
-    Node* targetChild = findNext(root, key);
-    if (!targetChild) {return {0, nullptr, false};}
-
-    Promotion p = insertHelper(targetChild, key);
-
-    if (p.happened) {
-        if (!insertInNode(root, p.promotionKey)) {
-            Promotion splitResult = split(root, p.promotionKey);
-
-            int newNodeValue = p.newNode->val1;
-            int rightValue = root->right->val1;
-            int middleValue = root->middle->val1;
-            int leftvalue = root->left->val1;
-
-            if (newNodeValue > rightValue) {
-                splitResult.newNode->right = p.newNode;
-                splitResult.newNode->left = root->right;
-                root->right = root->middle;
-                root->left = root->left;
-            } else if (newNodeValue > middleValue) {
-                splitResult.newNode->right = root->right;
-                splitResult.newNode->left = p.newNode;
-                root->right = root->middle;
-                root->left = root->left;
-            } else if (newNodeValue > leftvalue) {
-                splitResult.newNode->right = root->right;
-                splitResult.newNode->left = root->middle;
-                root->right = p.newNode;
-                root->left = root->left;
-            } else {
-                splitResult.newNode->right = root->right;
-                splitResult.newNode->left = root->middle;
-                root->right = root->left;
-                root->left = p.newNode;
-            }
-
-            root->middle = nullptr;
-            splitResult.newNode->middle = nullptr;
-
-            return splitResult;
-        }
-
-        alocateMiddleNode(root, p.newNode);
-
-        return {0, nullptr, false};
-    }
-
-    return {0, nullptr, false};
+    insertCombined(node, child->keys[mid], newNode);
 }
 
 Node* insert(Node* root, const int key) {
-    Promotion p = insertHelper(root, key);
-
-    if (p.happened) {
-        Node* lchild = root;
-
-        root = new Node(p.promotionKey);
-        root->left = lchild;
-        root->right = p.newNode;
+    if (!root) {
+        return new Node(key);
     }
+
+    if (isFull(root)) {
+        Node* newRoot = new Node();
+        newRoot->childs[0] = root;
+        split(newRoot, root);
+
+        root = newRoot;
+    }
+
+    Node* curr = root;
+    while (!isLeaf(curr)) {
+        int index = findIndex(curr->keys, curr->usedKeys, key);
+        Node* child = curr->childs[index];
+
+        if (isFull(child)) {
+            split(curr, child);
+
+            if (key > curr->keys[index]) {
+                child = curr->childs[index + 1];
+            }
+        }
+
+        curr = child;
+    }
+
+    insertCombined(curr, key, nullptr);
 
     return root;
 }
@@ -184,272 +170,219 @@ Node* insert(Node* root, const int key) {
 void inorder(Node* root) {
     if (!root) {return;}
 
-    inorder(root->left);
-    std::cout << root->val1 << " ";
-    if (root->hasVal2) {
-        inorder(root->middle);
-        std::cout << root->val2 << " ";
+    for (int i = 0; i < root->usedKeys; i++) {
+        inorder(root->childs[i]);
+        std::cout << root->keys[i] << " ";
     }
-    inorder(root->right);
+
+    inorder(root->childs[root->usedKeys]);
 }
 
-bool search(Node* root, const int key) {
-    while (root) {
-        if (key == root->val1) {
-            return true;
-        } else if (root->hasVal2 && key == root->val2) {
-            return true;
-        } else if (key < root->val1) {
-            root = root->left;
-        } else if (root->hasVal2 && key > root->val2) {
-            root = root->right;
-        } else {
-            root = root->middle;
-        }
+Successor findSuccessor(Node* root, const int key) {
+    Node* node = nullptr;
+    Node* subtree = nullptr;
+
+    int index = findIndex(root->keys, root->usedKeys, key);
+
+    subtree = root->childs[index + 1];
+
+    node = subtree;
+    while (node->childs[0]) {
+        node = node->childs[0];
+    }
+
+    return {node, subtree};
+}
+
+bool contains(Node* root, const int key) {
+    int index = findIndex(root->keys, root->usedKeys, key);
+
+    return root->keys[index] == key;
+}
+
+bool boundCheck(const int index, const int limit) {
+    return index >= 0 && index < limit;
+}
+
+Node* popRight(Node* node) {
+    Node* removedChild = node->childs[node->usedKeys];
+
+    node->childs[node->usedKeys] = nullptr;
+    node->keys[node->usedKeys - 1] = 0;
+
+    node->usedKeys--;
+    return removedChild;
+}
+
+Node* popLeft(Node* node) {
+    Node* removedChild = node->childs[0];
+
+    for (int i = 0; i < node->usedKeys - 1; i++) {
+        node->keys[i] = node->keys[i + 1];
+        node->childs[i] = node->childs[i + 1];
+    }
+
+    node->childs[node->usedKeys - 1] = node->childs[node->usedKeys];
+    node->childs[node->usedKeys] = nullptr;
+    node->keys[node->usedKeys - 1] = 0;
+
+    node->usedKeys--;
+    return removedChild;
+}
+
+void insertLeft(Node* node, const int key, Node* child) {
+    for (int i = node->usedKeys; i > 0; i--) {
+        node->keys[i] = node->keys[i - 1];
+        node->childs[i + 1] = node->childs[i];
+    }
+
+    node->childs[1] = node->childs[0];
+    node->childs[0] = child;
+    node->keys[0] = key;
+
+    node->usedKeys++;
+}
+
+bool borrow(Node* node, Node* child) {
+    int i = 0;
+    while (i <= node->usedKeys && node->childs[i] != child) {i++;}
+
+    int upperLimit = node->usedKeys + 1;
+    Node* currChild = nullptr;
+
+    if (boundCheck(i + 1, upperLimit) && node->childs[i + 1]->usedKeys >= MIN_KEYS) {
+        currChild = node->childs[i + 1];
+
+        insertCombined(child, node->keys[i], currChild->childs[0]);
+        node->keys[i] = currChild->keys[0];
+        popLeft(currChild);
+
+        return true;
+    }
+
+    if (boundCheck(i - 1, upperLimit) && node->childs[i - 1]->usedKeys >= MIN_KEYS) {
+        currChild = node->childs[i - 1];
+
+        insertLeft(child, node->keys[i - 1], currChild->childs[currChild->usedKeys]);
+        node->keys[i - 1] = currChild->keys[currChild->usedKeys - 1];
+        popRight(currChild);
+
+        return true;
     }
 
     return false;
 }
 
-bool removeInNode(Node* node, const int key) {
-    if (node->hasVal2) {
-        if (key == node->val1) {
-            node->val1 = node->val2;
-        }
+bool merge(Node* node, Node* child) {
+    bool childSurvived = true;
 
-        node->val2 = 0;
-        node->hasVal2 = false;
+    int i = 0;
+    while (i <= node->usedKeys && node->childs[i] != child) {i++;}
 
-        return true;
+    Node* left = nullptr;
+    Node* right = nullptr;
+    int parentIndex = 0;
+    
+    if (i < node->usedKeys) {
+        left = child;
+        right = node->childs[i + 1];
+        parentIndex = i;
     } else {
-        node->val1 = 0;
-        return false;
-    }
-}
-
-Successor findSuccessor(Node* root, const int key) {
-    if (root->val1 == key) {
-        if (root->hasVal2) {
-            root = root->middle;
-        } else {
-            root = root->right;
-        }
-    } else {
-        root = root->right;
+        left = node->childs[i - 1];
+        right = child;
+        parentIndex = i - 1;
+        childSurvived = false;
     }
 
-    Node* node = root;
-    while (node->left) {
-        node = node->left;
+    left->keys[left->usedKeys] = node->keys[parentIndex];
+    left->childs[left->usedKeys + 1] = right->childs[0];
+    left->usedKeys++;
+
+    for (int j = 0; j < right->usedKeys; j++) {
+        left->keys[left->usedKeys] = right->keys[j];
+        left->childs[left->usedKeys + 1] = right->childs[j + 1];
+        left->usedKeys++;
     }
 
-    return {node, root};
+    for (int j = parentIndex; j < node->usedKeys - 1; j++) {
+        node->keys[j] = node->keys[j + 1];
+        node->childs[j + 1] = node->childs[j + 2];
+    }
+    
+    node->keys[node->usedKeys - 1] = 0;
+    node->childs[node->usedKeys] = nullptr;
+    node->usedKeys--;
+
+    delete right;
+
+    return childSurvived;
 }
 
-bool contains(Node* root, const int key) {
-    return root->val1 == key || (root->hasVal2 && root->val2 == key);
+void removeKeyInLeaf(Node* node, const int key) {
+    int index = findIndex(node->keys, node->usedKeys, key);
+
+    if (!(node->keys[index] == key) || !isLeaf(node)) {return;}
+
+    for (int i = index; i < node->usedKeys - 1; i++) {
+        node->keys[i] = node->keys[i + 1];
+    }
+
+    node->keys[node->usedKeys - 1] = 0;
+    node->usedKeys--;
 }
 
-bool borrow(Node* node, Empty e) {
-    if (node->left == e.deletedNode) {
-        if (node->middle) {
-            if (node->middle->hasVal2) {
-                e.deletedNode->val1 = node->val1;
-                node->val1 = node->middle->val1;
-                removeInNode(node->middle, node->middle->val1);
+Node* remove(Node* root, int key) {
+    if (!root) {return nullptr;}
 
-                e.deletedNode->right = node->middle->left;
-                node->middle->left = node->middle->middle;
-                node->middle->middle = nullptr;
-            } else {
-                return false;
-            }
-        } else {
-            if (node->right->hasVal2) {
-                e.deletedNode->val1 = node->val1;
-                node->val1 = node->right->val1;
-                removeInNode(node->right, node->right->val1);
+    if (root->usedKeys == 1 && !isLeaf(root)) {
+        Node* left = root->childs[0];
+        Node* right = root->childs[1];
 
-                e.deletedNode->right = node->right->left;
-                node->right->left = node->right->middle;
-                node->right->middle = nullptr;
-            } else {
-                return false;
-            }
-        }
-    } else if (node->middle == e.deletedNode) {
-        if (node->right->hasVal2) {
-            e.deletedNode->val1 = node->val2;
-            node->val2 = node->right->val1;
-            removeInNode(node->right, node->right->val1);
-
-            e.deletedNode->right = node->right->left;
-            node->right->left = node->right->middle;
-            node->right->middle = nullptr;
-        } else if (node->left->hasVal2) {
-            e.deletedNode->val1 = node->val1;
-            node->val1 = node->left->val2;
-            removeInNode(node->left, node->left->val2);
-
-            e.deletedNode->right = e.deletedNode->left;
-            e.deletedNode->left = node->left->right;
-            node->left->right = node->left->middle;
-            node->left->middle = nullptr;
-        } else {
-            return false;
-        }
-    } else {
-        if (node->middle) {
-            if (node->middle->hasVal2) {
-                e.deletedNode->val1 = node->val2;
-                node->val2 = node->middle->val2;
-                removeInNode(node->middle, node->middle->val2);
-
-                e.deletedNode->right = e.deletedNode->left;
-                e.deletedNode->left = node->middle->right;
-                node->middle->right = node->middle->middle;
-                node->middle->middle = nullptr;
-            } else {
-                return false;
-            }
-        } else {
-            if (node->left->hasVal2) {
-                e.deletedNode->val1 = node->val1;
-                node->val1 = node->left->val2;
-                removeInNode(node->left, node->left->val2);
-
-                e.deletedNode->right = e.deletedNode->left;
-                e.deletedNode->left = node->left->right;
-                node->left->right = node->left->middle;
-                node->left->middle = nullptr;
-            } else {
-                return false;
-            }
+        if (left->usedKeys < MIN_KEYS && right->usedKeys < MIN_KEYS) {
+            merge(root, left);
+            Node* newRoot = left;
+            delete root;
+            root = newRoot;
         }
     }
 
-    return true;
-}
+    Node* curr = root;
 
-Empty merge(Node* node, Empty e) {
-    Empty result = {nullptr, false};
+    while (!isLeaf(curr)) {
+        int index = findIndex(curr->keys, curr->usedKeys, key);
 
-    if (e.deletedNode == node->left) {
-        if (node->middle) {
-            node->middle->val2 = node->middle->val1;
-            node->middle->val1 = node->val1;
-            node->middle->hasVal2 = true;
-            removeInNode(node, node->val1);
+        if (index < curr->usedKeys && curr->keys[index] == key) {
+            Successor s = findSuccessor(curr, key);
+            curr->keys[index] = s.node->keys[0];
+            key = s.node->keys[0];
 
-            node->middle->middle = node->middle->left;
-            node->middle->left = node->left->left;
-
-            node->left = node->middle;
-            node->middle = nullptr;
-        } else {
-            node->right->val2 = node->right->val1;
-            node->right->val1 = node->val1;
-            node->right->hasVal2 = true;
-            removeInNode(node, node->val1);
-
-            node->right->middle = node->right->left;
-            node->right->left = node->left->left;
-
-            node->left = node->right;
-            node->right = nullptr;
-
-            result = {node, true};
-        }
-    } else if (e.deletedNode == node->middle) {
-        node->right->val2 = node->right->val1;
-        node->right->val1 = node->val2;
-        node->right->hasVal2 = true;
-        removeInNode(node, node->val2);  
-
-        node->right->middle = node->right->left;
-        node->right->left = node->middle->left;
-
-        node->middle = nullptr;
-    } else {
-        if (node->middle) {
-            node->middle->val1 = node->middle->val1;
-            node->middle->val2 = node->val2;
-            node->middle->hasVal2 = true;
-            removeInNode(node, node->val2);
-
-            node->middle->middle = node->middle->right;
-            node->middle->right = node->right->left;
-
-            node->right = node->middle;
-            node->middle = nullptr;
-        } else {
-            node->left->val2 = node->val1;
-            node->left->hasVal2 = true;
-            removeInNode(node, node->val1);
-
-            node->left->middle = node->left->right;
-            node->left->right = node->right->left;
-
-            node->right = nullptr;
-
-            result = {node, true};
-        }
-    }
-
-    delete e.deletedNode;
-
-    return result;
-}
-
-Empty removeHelper(Node* root, const int key) {
-    if (contains(root, key)) {
-        if (!hasSons(root)) {
-            if (!removeInNode(root, key)) {
-                return {root, true};
-            }
-
-            return {nullptr, false};
+            index++;
         }
 
-        Successor s = findSuccessor(root, key);
+        Node* child = curr->childs[index];
         
-        if (root->val1 == key) {
-            root->val1 = s.node->val1;
-        } else {
-            root->val2 = s.node->val1;
-        }
-
-        Empty e = removeHelper(s.subtree, s.node->val1);
-
-        if (e.happened) {
-            if (!borrow(root, e)) {
-                return merge(root, e);
+        if (child->usedKeys < MIN_KEYS) {
+            if (!borrow(curr, child)) {
+                merge(curr, child);
             }
-        }   
 
-        return {nullptr, false};
-    }
-
-    Node* targetChild = findNext(root, key);
-    if (!targetChild) {return {nullptr, false};}
-
-    Empty e = removeHelper(targetChild, key);
-
-    if (e.happened) {
-        if (!borrow(root, e)) {
-            return merge(root, e);
+            index = findIndex(curr->keys, curr->usedKeys, key);
+            if (index < curr->usedKeys && curr->keys[index] == key) {index++;}
+            child = curr->childs[index];
         }
+
+        curr = child;
     }
 
-    return {nullptr, false};
-}
+    removeKeyInLeaf(curr, key);
 
-Node* remove(Node* root, const int key) {
-    Empty e = removeHelper(root, key);
-
-    if (e.happened) {
-        root = e.deletedNode->left;
-        delete e.deletedNode;
+    if (root->usedKeys == 0) {
+        Node* temp = nullptr;
+        if (!isLeaf(root)) {
+            temp = root->childs[0];
+        }
+        delete root;
+        return temp;
     }
 
     return root;
@@ -458,9 +391,9 @@ Node* remove(Node* root, const int key) {
 void deleteTree(Node* root) {
     if (!root) {return;}
 
-    deleteTree(root->left);
-    if (root->hasVal2) {deleteTree(root->middle);}
-    deleteTree(root->right);
+    for (int i = 0; i <= root->usedKeys; i++) {
+        deleteTree(root->childs[i]);
+    }
 
     delete root;
 }
@@ -477,16 +410,14 @@ void levelorder(Node* root) {
         std::cout << "Heigh " << height << ": ";
         for (int i = 0; i < size; i++) {
             node = q.front();
-            std::cout << node->val1;
-            if (node->hasVal2) {
-                std::cout << "|" << node->val2;
+            for (int i = 0; i < node->usedKeys; i++) {
+                std::cout << node->keys[i];
+                if (i != (node->usedKeys - 1)) std::cout << "|";
+                if (!isLeaf(node)) q.push(node->childs[i]);
             }
             std::cout << " ";
+            if (!isLeaf(node)) q.push(node->childs[node->usedKeys]);
             q.pop();
-
-            if (node->left) q.push(node->left);
-            if (node->middle) q.push(node->middle);
-            if (node->right) q.push(node->right);
         }
 
         std::cout << std::endl;
@@ -495,6 +426,9 @@ void levelorder(Node* root) {
 }
 
 int main() {
+    // LIMIT of Order 3 B-Trees
+    if (KEYS < 3) {return 1;}
+
     Node* root = new Node(20);
     root = insert(root, 30);
     root = insert(root, 40);
@@ -503,15 +437,9 @@ int main() {
     root = insert(root, 70);
     root = insert(root, 80);
     root = insert(root, 90);
-
-    inorder(root);
-    std::cout << std::endl;
-    
-    root = remove(root, 50);
-    root = remove(root, 20);
-    
-    inorder(root);
-    std::cout << std::endl;
+    root = insert(root, 100);
+    root = insert(root, 110);
+    root = insert(root, 120);
 
     levelorder(root);
 

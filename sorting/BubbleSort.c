@@ -1,7 +1,7 @@
 /*
     Time complexity: O(n^2)
     Space complexity: O(1) - dont use extra space.
-    Is Adaptive - can check if array is already sorted and stop the sorting.
+    Can be Adaptive - can check if array is already sorted and stop the sorting.
     Is Stable - keeps the current order of same weight elements.
 
     Can be used to sort only a section of list - with 3 passes the list will have 3 greater elements in the end.

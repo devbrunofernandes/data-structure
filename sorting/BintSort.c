@@ -4,7 +4,7 @@
     Is NOT Adaptive - can NOT easily sort a almost sorted list.
     Is Stable - Can keep the current order of same weight elements.
 
-    Only indicated for lists with short range of possible numbers. Otherwise can use really high amount of memory and dont be as fast as possible.
+    Didatic implementation. Ineficient for integers (use Count Sort).
     Its non comparative sorting - can only sort numbers.
 */
 
@@ -14,6 +14,11 @@
 struct MinMax {
     int min;
     int max;
+};
+
+struct Node {
+    int value;
+    struct Node* next;
 };
 
 void printArray(int* array, const int size) {
@@ -42,7 +47,7 @@ struct MinMax findMinMax(int* array, const int size) {
     return result;
 }
 
-void countSort(int* array, const int size) {
+void binSort(int* array, const int size) {
 
     const struct MinMax mm = findMinMax(array, size);
 
@@ -51,47 +56,41 @@ void countSort(int* array, const int size) {
 
     const int range = max - min + 1;
 
-    int* count = (int *) calloc((max - min) + 1, sizeof(int));
-    int* output = (int *) malloc(sizeof(int) * size);
+    struct Node** bins = (struct Node**) calloc((max - min) + 1, sizeof(struct Node*));
 
-    for (int i = 0; i < size; i++) 
-        count[array[i] - min]++;
+    for (int i = 0; i < size; i++) {
 
-    for (int i = 1; i < range; i++) 
-        count[i] += count[i - 1];
+        struct Node* bin = bins[array[i] - min];
 
-    for (int i = size - 1; i >= 0; i--) {
-        output[count[array[i] - min] - 1] = array[i];
-        count[array[i] - min]--;
+        struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
+        newNode->value = array[i];
+        newNode->next = NULL;
+
+        while (bin && bin->next) bin = bin->next;
+
+        if (!bin)
+            bins[array[i] - min] = newNode;
+        else
+            bin->next = newNode;
     }
     
-    for (int i = 0; i < size; i++)
-        array[i] = output[i];
+    int index = 0;
 
-    free(count);
-    free(output);
-}
+    for (int i = 0; i < range; i++) {
 
-/*  Simple version of count sort: (only for positive numbers sort)
+        while (bins[i]) {
+            struct Node* bin = bins[i];
+            
+            array[index++] = bin->value;
 
-    void countSort(int* array, const int size) {
+            bins[i] = bin->next;
 
-        int greaterElement = findGreater(array, size);
-
-        int* count = (int *) calloc(greaterElement + 1, sizeof(int));
-
-        for (int i = 0; i < size; i++) count[array[i]]++;
-
-        int index = 0;
-
-        for (int i = 0; i <= greaterElement; i++)
-            for (int j = 0; j < count[i]; j++)
-                array[index++] = i;
-        
-        free(count);
+            free(bin);
+        }
     }
 
-*/
+    free(bins);
+}
 
 int main() {
     const int size = 11;
@@ -100,9 +99,9 @@ int main() {
     printf("Array before sort: ");
     printArray(array, size);
 
-    countSort(array, size);
+    binSort(array, size);
 
-    printf("Array after sort: ");
+    printf("Array after sort:  ");
     printArray(array, size);
 
     return 0;

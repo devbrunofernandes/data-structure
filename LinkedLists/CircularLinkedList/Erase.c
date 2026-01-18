@@ -1,7 +1,5 @@
-#include <cstddef>
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 
 // circular linked list
 // the last node points to the first node
@@ -56,45 +54,46 @@ void display(struct Node *h)
     printf("\n");
 }
 
-void insert(struct Node *p, int index, int x)
+int erase(struct Node *p, int index)
 {
-    struct Node *t;
+    struct Node *q;
+    int x;
+    
+    if(index < 1 || index > length(p))
+        return -1;
 
-    if(index<0 || index > length(p))
-        return;
-
-    if(index==0)
+    if(index==1)
     {
-        t = (struct Node *) malloc(sizeof(struct Node));
-        t->data = x;
-        if(head == NULL)
+        while(p->next != head)
         {
-            head = t;
-            head->next = head;
+            p = p->next;
+        }
+
+        x = head->data;
+        if(head==p)
+        {
+            free(head);
+            head = NULL;
         }
         else
         {
-            while(p->next!=head)
-            {
-                p=p->next;
-            }
-
-            p->next = t;
-            t->next = head;
-            head = t;
+            p->next = head->next;
+            free(head);
+            head = p->next;
         }
     }
     else
     {
-        for(int i=0; i<index-1; i++)
-        {
-            p=p->next;
-        }
-        t = (struct Node *) malloc(sizeof(struct Node));
-        t->data = x;
-        t->next = p->next;
-        p->next = t;
+        for(int i=0; i < index-2; i++)
+            p = p->next;
+
+        q = p->next;
+        p->next = q->next;
+        x = q->data;
+        free(q);
     }
+
+    return x;
 }
 
 int main() 
@@ -102,7 +101,7 @@ int main()
     int A[] = {2,3,4,5,6};
     create(A, 5);
 
-    insert(head, 5, 10);
+    erase(head, 5);
     display(head);
 
     return 0;

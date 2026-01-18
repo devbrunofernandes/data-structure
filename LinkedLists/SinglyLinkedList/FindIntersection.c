@@ -1,6 +1,7 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
-
+#include <stdbool.h>
+#include <stdint.h>
 // More flexible data structure than arrays, can decrease and increase in size easily.
 
 // A NODE IN LINKED LIST TAKE THE DATA AND A POINTER TO THE NEXT NODE
@@ -8,7 +9,7 @@ struct Node
 {
     int data;
     struct Node *next;
-}; // GLOBAL POINTER TO FIRST AND LAST ELEMENT IN LINKED LIST
+}*first = NULL; // GLOBAL POINTER TO FIRST ELEMENT IN LINKED LIST
 
 // CREATION OF LINKED LIST USING AN ARRAY AS PARAMETER
 struct Node *create(int A[], int n)
@@ -43,35 +44,45 @@ void display(struct Node *p)
     printf("\n");
 }
 
-// uses two pointers to check if the list has loop
-// one pointers move 1 step and the other 2 steps. if the pointers meet at the same value means the list has loop
-bool is_loop_2pointers(struct Node *p)
+struct Node* findIntersection(struct Node *p, struct Node *q)
 {
-    struct Node *q;
+    struct Node *stack1[100], *stack2[100], *intersec_point;
+    int i=0, j=0;
 
-    do
+    while(p)
     {
-        p = p->next;
-        q = q->next;
-        q=q?q->next:q;
-    } while (p && q && p!=q);
+        stack1[i] = p;
+        i++;
+        p=p->next;
+    }
 
-    if (q == p)
-        return true;
-    return false;
+    while(q)
+    {
+        stack2[j] = q;
+        j++;
+        q=q->next;
+    }
+
+    while(stack1[i] == stack2[j])
+    {
+        intersec_point = stack1[i];
+        i--;
+        j--;
+    }
+
+    return intersec_point;
 }
 
 int main()
 {
     int A[] = {1,2,3,4,5};
-    struct Node *first = create(A, 5), *t1, *t2;
+    int B[] = {6,7,8,9,10};
+    struct Node *first = create(A, 5), *second = create(B, 5);
+    
+    second->next->next = first->next->next->next;
+    struct Node *m = findIntersection(first, second);
 
-    // setting loop
-    t1=first->next->next;
-    t2=first->next->next->next->next;
-    t2->next = t1;
-
-    is_loop_2pointers(first)?printf("The list has loop\n"):printf("The list has no loop\n");
+    printf("intersection node data: %d\n", m->data);
 
     return 0;
 }

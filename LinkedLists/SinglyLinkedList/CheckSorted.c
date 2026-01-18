@@ -1,6 +1,7 @@
-#include <cstdint>
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 // More flexible data structure than arrays, can decrease and increase in size easily.
 
@@ -42,7 +43,7 @@ void display(struct Node *p)
     printf("\n");
 }
 
-bool is_sorted(struct Node *p)
+bool isSorted(struct Node *p)
 {
     int x = INT32_MIN;
 
@@ -64,7 +65,7 @@ int main()
     create(A, 6);
     display(first);
 
-    is_sorted(first)? printf("The list is sorted\n"):printf("The list is not sorted\n");
+    isSorted(first) ? printf("The list is sorted\n") : printf("The list is not sorted\n");
 
     return 0;
 }

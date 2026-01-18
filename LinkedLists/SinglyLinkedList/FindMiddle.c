@@ -1,6 +1,7 @@
-#include <algorithm>
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 // More flexible data structure than arrays, can decrease and increase in size easily.
 
@@ -12,10 +13,10 @@ struct Node
 }*first = NULL; // GLOBAL POINTER TO FIRST ELEMENT IN LINKED LIST
 
 // CREATION OF LINKED LIST USING AN ARRAY AS PARAMETER
-struct Node *create(int A[], int n)
+void create(int A[], int n)
 {
     int i;
-    struct Node *t, *last, *first;
+    struct Node *t, *last;
 
     first = (struct Node *) malloc(sizeof(struct Node));
     first->data = A[0];
@@ -30,8 +31,6 @@ struct Node *create(int A[], int n)
         last->next = t;
         last = t;
     }
-
-    return first;
 }
 
 void display(struct Node *p)
@@ -44,45 +43,29 @@ void display(struct Node *p)
     printf("\n");
 }
 
-struct Node* find_intersection(struct Node *p, struct Node *q)
+int findMiddle(struct Node *p)
 {
-    struct Node *stack1[100], *stack2[100], *intersec_point;
-    int i=0, j=0;
+    struct Node *q = p;
 
-    while(p)
+    while (q)
     {
-        stack1[i] = p;
-        i++;
-        p=p->next;
-    }
-
-    while(q)
-    {
-        stack2[j] = q;
-        j++;
         q=q->next;
+        if (q)
+            q = q->next;
+        if (q)
+            p =p->next;
     }
 
-    while(stack1[i] == stack2[j])
-    {
-        intersec_point = stack1[i];
-        i--;
-        j--;
-    }
-
-    return intersec_point;
+    return p->data;
 }
 
 int main()
 {
-    int A[] = {1,2,3,4,5};
-    int B[] = {6,7,8,9,10};
-    struct Node *first = create(A, 5), *second = create(B, 5);
-    
-    second->next->next = first->next->next->next;
-    struct Node *m = find_intersection(first, second);
+    int A[] = {3,5,7,10,15,8,12,2};
+    create(A, 8);
 
-    printf("intersection node data: %d\n", m->data);
+    printf("middle value: %d\n", findMiddle(first));
+    display(first);
 
     return 0;
 }

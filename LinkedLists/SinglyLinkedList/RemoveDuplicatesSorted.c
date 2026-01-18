@@ -1,5 +1,7 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 // More flexible data structure than arrays, can decrease and increase in size easily.
 
@@ -41,59 +43,32 @@ void display(struct Node *p)
     printf("\n");
 }
 
-void reverse_elements(struct Node *p, const int size)
+void removeDuplicates(struct Node *p)
 {
-    int i = 0, aux[size];
-    struct Node *q = p;
+    struct Node *q = p->next;
 
-    while (q) 
+    while (q)
     {
-        aux[i++] = q->data;
-        q = q->next;
-    }
-
-    while (p)
-    {
-        p->data = aux[--i];
-        p = p->next;
-    }
-}
-
-void reverse_links(struct Node *p)
-{
-    struct Node *q = NULL, *r = NULL;
-
-    while (p)
-    {
-        // Sliding pointers algorithm
-        r = q;
-        q = p;
-        p = p->next;
-        // ===========================
-        q->next = r;
-    }
-    first = q;
-}
-
-void reverse_recursive(struct Node *q, struct Node *p)
-{
-    if (p)
-    {
-        reverse_recursive(p, p->next);
-        p->next = q;
-    }
-    else
-    {
-        first = q;
+        if (q->data != p->data)
+        {
+            p = q;
+            q = q->next;
+        }
+        else 
+        {
+            p->next = q->next;
+            free(q);
+            q = p->next;
+        }
     }
 }
 
 int main()
 {
-    int A[] = {2,4,6,8,10,12,14,16,18,20};
-    create(A, 10);
+    int A[] = {3,5,5,8,8,8};
+    create(A, 6);
 
-    reverse_recursive(NULL, first);
+    removeDuplicates(first);
     display(first);
 
     return 0;

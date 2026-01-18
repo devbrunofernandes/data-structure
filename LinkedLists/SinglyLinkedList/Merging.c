@@ -1,5 +1,7 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 // More flexible data structure than arrays, can decrease and increase in size easily.
 

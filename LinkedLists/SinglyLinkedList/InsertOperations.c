@@ -1,6 +1,7 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
-
+#include <stdbool.h>
+#include <stdint.h>
 // More flexible data structure than arrays, can decrease and increase in size easily.
 
 // A NODE IN LINKED LIST TAKE THE DATA AND A POINTER TO THE NEXT NODE
@@ -83,7 +84,7 @@ void insert(struct Node *p, int index, int data)
 */
 
 
-void insert_sorted(struct Node *p, int data)
+void insertSorted(struct Node *p, int data)
 {
     struct Node *q = NULL, *t = (struct Node *) malloc(sizeof(struct Node));
     t->data = data;
@@ -140,7 +141,7 @@ int main()
     printf("Sorted linked list: ");
     display(first);
 
-    insert_sorted(first, 5);
+    insertSorted(first, 5);
     printf("Sorted linked list after insert(5): ");
     display(first);
 

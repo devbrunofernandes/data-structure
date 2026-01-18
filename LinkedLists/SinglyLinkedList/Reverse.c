@@ -1,5 +1,7 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 // More flexible data structure than arrays, can decrease and increase in size easily.
 
@@ -41,47 +43,59 @@ void display(struct Node *p)
     printf("\n");
 }
 
-int delete_node(int index)
+void reverseElements(struct Node *p, const int size)
 {
-    int x, counter = 1;
-    struct Node *p = first, *q = NULL;
+    int i = 0, aux[size];
+    struct Node *q = p;
 
-    if (first == NULL) return -1;
-    if (index < 1) {index = 1;}
-
-    if (index == 1)
+    while (q) 
     {
-        first = first->next;
-
-        x = p->data;
-        free(p);
-    }
-    else 
-    {
-        while (p->next && counter < index)
-        {
-            q = p;
-            p = p->next;
-            counter++;
-        }
-
-        q->next = p->next;
-        x = p->data;
-        free(p);
+        aux[i++] = q->data;
+        q = q->next;
     }
 
-    return x;
+    while (p)
+    {
+        p->data = aux[--i];
+        p = p->next;
+    }
+}
+
+void reverseLinks(struct Node *p)
+{
+    struct Node *q = NULL, *r = NULL;
+
+    while (p)
+    {
+        // Sliding pointers algorithm
+        r = q;
+        q = p;
+        p = p->next;
+        // ===========================
+        q->next = r;
+    }
+    first = q;
+}
+
+void reverseRecursive(struct Node *q, struct Node *p)
+{
+    if (p)
+    {
+        reverseRecursive(p, p->next);
+        p->next = q;
+    }
+    else
+    {
+        first = q;
+    }
 }
 
 int main()
 {
-    int A[] = {3,5,7,10,15,8,12,2};
-    create(A, 8);
-    printf("Linked list before deleting: ");
-    display(first);
+    int A[] = {2,4,6,8,10,12,14,16,18,20};
+    create(A, 10);
 
-    delete_node(2);
-    printf("Linked list after deleting:  ");
+    reverseRecursive(NULL, first);
     display(first);
 
     return 0;

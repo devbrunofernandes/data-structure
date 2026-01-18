@@ -1,5 +1,7 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 // More flexible data structure than arrays, can decrease and increase in size easily.
 
@@ -41,32 +43,47 @@ void display(struct Node *p)
     printf("\n");
 }
 
-void remove_duplicates(struct Node *p)
+int deleteNode(int index)
 {
-    struct Node *q = p->next;
+    int x, counter = 1;
+    struct Node *p = first, *q = NULL;
 
-    while (q)
+    if (first == NULL) return -1;
+    if (index < 1) {index = 1;}
+
+    if (index == 1)
     {
-        if (q->data != p->data)
-        {
-            p = q;
-            q = q->next;
-        }
-        else 
-        {
-            p->next = q->next;
-            free(q);
-            q = p->next;
-        }
+        first = first->next;
+
+        x = p->data;
+        free(p);
     }
+    else 
+    {
+        while (p->next && counter < index)
+        {
+            q = p;
+            p = p->next;
+            counter++;
+        }
+
+        q->next = p->next;
+        x = p->data;
+        free(p);
+    }
+
+    return x;
 }
 
 int main()
 {
-    int A[] = {3,5,5,8,8,8};
-    create(A, 6);
+    int A[] = {3,5,7,10,15,8,12,2};
+    create(A, 8);
+    printf("Linked list before deleting: ");
+    display(first);
 
-    remove_duplicates(first);
+    deleteNode(2);
+    printf("Linked list after deleting:  ");
     display(first);
 
     return 0;

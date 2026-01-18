@@ -1,4 +1,4 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
 
 struct Node
@@ -50,36 +50,36 @@ int length(struct Node *p)
     return len;
 }
 
-int remove(struct Node *p, int index)
+void insert(struct Node *p, int index, int x)
 {
-    int x = -1;
+    struct Node *t;
+    
+    if(index < 0 || index > length(p))
+        return;
 
-    if(index < 1 || index > length(p))
-        return x;
-
-    if(index==1)
+    if(index == 0)
     {
-        first = first->next;
-        if(first)
-            first->prev = NULL;
-
-        x = p->data;
-        free(p);
+        t = (struct Node *) malloc(sizeof(struct Node));
+        t->data = x;
+        t->prev = NULL;
+        t->next = first;
+        first->prev = t;
+        first = t;
     }
     else
     {
         for(int i=0; i<index-1; i++)
-            p =p->next;
+            p=p->next;
 
-        p->prev->next = p->next;
+        t = (struct Node *) malloc(sizeof(struct Node));
+        t->data = x;
+
+        t->prev = p;
+        t->next = p->next;
         if(p->next)
-            p->next->prev = p->prev;
-
-        x = p->data;
-        free(p);
+            p->next->prev = t;
+        p->next = t;
     }
-
-    return x;
 }
 
 int main()
@@ -87,7 +87,7 @@ int main()
     int A[] = {10,20,30,40,50};
     create(A, 5);
 
-    remove(first, 4);
+    insert(first, 2, 25);
 
     printf("length is %d\n", length(first));
     display(first);

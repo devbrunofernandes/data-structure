@@ -1,6 +1,5 @@
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 
 // circular linked list
 // the last node points to the first node
@@ -43,12 +42,13 @@ void display(struct Node *h)
 void recursive_display(struct Node *h)
 {
     static int flag = 0;
-    if(h != head || flag == 0)
-    {
+    
+    if(h != head || flag == 0) {
         flag = 1;
         printf("%d ", h->data);
         recursive_display(h->next);
     }
+
     flag = 0;
 }
 

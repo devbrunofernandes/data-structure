@@ -1,6 +1,7 @@
-#include <cstdint>
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 // More flexible data structure than arrays, can decrease and increase in size easily.
 
@@ -77,11 +78,11 @@ int count(struct Node *p)
     return c;
 }
 
-int recursive_count(struct Node *p)
+int recursiveCount(struct Node *p)
 {
     if (p == NULL)
         return 0;
-    return recursive_count(p->next) + 1;
+    return recursiveCount(p->next) + 1;
 }
 
 // FUNCTIONS TO SUM ALL NODE DATA VALUES
@@ -96,11 +97,11 @@ int sum(struct Node *p)
     return s;
 }
 
-int recursive_sum(struct Node *p)
+int recursiveSum(struct Node *p)
 {
     if (p == NULL)
         return 0;
-    return recursive_sum(p->next) + p->data;
+    return recursiveSum(p->next) + p->data;
 }
 
 // FUNCTIONS TO FIND THE GREATER ELEMENT IN THE LIST
@@ -116,7 +117,7 @@ int max(struct Node *p)
     return m;
 }
 
-int recursive_max(struct Node *p)
+int recursiveMax(struct Node *p)
 {
     static int m = INT32_MIN;
     if (p == NULL)
@@ -124,7 +125,7 @@ int recursive_max(struct Node *p)
 
     if (p->data > m)
         m = p->data;
-    return recursive_max(p->next);
+    return recursiveMax(p->next);
 }
 
 // FUNCTIONS TO SEARCH SOME VALUE IN LINKED LIST
@@ -139,19 +140,19 @@ struct Node* search(struct Node *p, int key)
     return NULL;
 }
 
-struct Node* recursive_search(struct Node *p, int key)
+struct Node* recursiveSearch(struct Node *p, int key)
 {
     if (p == NULL)
         return NULL;
 
     if (p->data == key)
         return p;
-    return recursive_search(p->next, key);
+    return recursiveSearch(p->next, key);
 }
 
 // IMPROVING LINEAR SEARCH OPERATION
 // MOVE TO HEAD - brings the found key value to the beginning of the list to be accessed earlier in another search for the same value.
-struct Node* search_head(struct Node *p, int key)
+struct Node* searchHead(struct Node *p, int key)
 {
     struct Node *q = NULL; // tail pointer -> will follow p pointer so we can access the node before p.
     while(p)
@@ -176,12 +177,12 @@ int main()
     create(A, 8);
 
     display(first);
-    printf("list number of nodes: %d\n", recursive_count(first));
+    printf("list number of nodes: %d\n", recursiveCount(first));
     printf("sum of node values: %d\n", sum(first));
     printf("maximum value in the list: %d\n\n", max(first));
 
     int key = 2;
-    struct Node *temp = search_head(first, key);
+    struct Node *temp = searchHead(first, key);
     temp? printf("%d is in the list.\n", key):printf("%d is not in the list.\n", key);
     display(first);
 

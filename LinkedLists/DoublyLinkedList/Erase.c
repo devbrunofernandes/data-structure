@@ -1,4 +1,4 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
 
 struct Node
@@ -50,10 +50,44 @@ int length(struct Node *p)
     return len;
 }
 
+int erase(struct Node *p, int index)
+{
+    int x = -1;
+
+    if(index < 1 || index > length(p))
+        return x;
+
+    if(index==1)
+    {
+        first = first->next;
+        if(first)
+            first->prev = NULL;
+
+        x = p->data;
+        free(p);
+    }
+    else
+    {
+        for(int i=0; i<index-1; i++)
+            p =p->next;
+
+        p->prev->next = p->next;
+        if(p->next)
+            p->next->prev = p->prev;
+
+        x = p->data;
+        free(p);
+    }
+
+    return x;
+}
+
 int main()
 {
     int A[] = {10,20,30,40,50};
     create(A, 5);
+
+    erase(first, 4);
 
     printf("length is %d\n", length(first));
     display(first);

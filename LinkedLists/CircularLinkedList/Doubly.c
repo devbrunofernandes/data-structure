@@ -1,4 +1,4 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
 
 struct Node
@@ -95,7 +95,7 @@ void insert(struct Node *p, int index, int x)
     }
 }
 
-int remove(struct Node *p, int index)
+int erase(struct Node *p, int index)
 {
     int x = -1;
 
@@ -130,7 +130,7 @@ int main()
     create(A, 5);
 
     insert(head, 2, 25);
-    remove(head, 4);
+    erase(head, 4);
     insert(head, 0, 5);
 
     display(head);

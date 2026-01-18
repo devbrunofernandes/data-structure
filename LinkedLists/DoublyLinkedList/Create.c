@@ -1,4 +1,4 @@
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
 
 struct Node
@@ -50,28 +50,10 @@ int length(struct Node *p)
     return len;
 }
 
-void reverse(struct Node *p)
-{
-    struct Node *temp;
-
-    while(p)
-    {
-        temp = p->next;
-        p->next = p->prev;
-        p->prev = temp;
-
-        p = p->prev;
-        if(p && p->next == NULL)
-            first = p;
-    }
-}
-
 int main()
 {
     int A[] = {10,20,30,40,50};
     create(A, 5);
-
-    reverse(first);
 
     printf("length is %d\n", length(first));
     display(first);

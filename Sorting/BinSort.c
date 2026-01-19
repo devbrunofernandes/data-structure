@@ -1,11 +1,11 @@
 /*
     Time complexity: O(n + k) - k is the range between min and max value in list.
     Space complexity: O(n + k) - high memory use.
-    Is NOT Adaptive - can NOT easily sort a almost sorted list.
+    Is NOT Adaptive - can NOT easily sort an almost sorted list.
     Is Stable - Can keep the current order of same weight elements.
 
-    Didatic implementation. Ineficient for integers (use Count Sort).
-    Its non comparative sorting - can only sort numbers.
+    Didactic implementation. Inefficient for integers (use Count Sort).
+    Its non-comparative sorting - can only sort numbers.
 */
 
 #include <stdlib.h>
@@ -47,7 +47,7 @@ struct MinMax findMinMax(int* array, const int size) {
     return result;
 }
 
-void binSort(int* array, const int size) {
+void radixSort(int* array, const int size) {
 
     const struct MinMax mm = findMinMax(array, size);
 
@@ -99,7 +99,7 @@ int main() {
     printf("Array before sort: ");
     printArray(array, size);
 
-    binSort(array, size);
+    radixSort(array, size);
 
     printf("Array after sort:  ");
     printArray(array, size);

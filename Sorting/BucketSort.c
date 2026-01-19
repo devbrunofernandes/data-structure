@@ -4,7 +4,6 @@
     Is NOT Adaptive - can NOT easily sort an almost sorted list.
     Is Stable - Can keep the current order of same weight elements.
 
-    Didactic implementation. Inefficient for integers (use Count Sort).
     Its non-comparative sorting - can only sort numbers.
 */
 

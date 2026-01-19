@@ -52,6 +52,25 @@ void print(LinkedList* ll) {
     printf("]\n");
 }
 
+int front(LinkedList* ll) {
+
+    if (ll == NULL || ll->first == NULL) {
+        fprintf(stderr, "Fatal Error: Attempted to access front of an empty or NULL list.\n");
+        exit(EXIT_FAILURE);
+    }
+    return ll->first->data;
+}
+
+int back(LinkedList* ll) {
+    
+    if (ll == NULL || ll->first == NULL) {
+        fprintf(stderr, "Fatal Error: Attempted to access back of an empty or NULL list.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    return ll->last->data;
+}
+
 void insert(LinkedList* ll, int index, int value)
 {
     Node *t, *p = ll->first;
@@ -172,17 +191,4 @@ void freeList(LinkedList* ll) {
     }
 
     free(ll);
-}
-
-int main() {
-
-    int A[] = {10,20,30,40,50};
-    LinkedList* ll = arrayToLinkedList(A, 5);
-
-    insert(ll, 2, 25);
-
-    printf("length is %d\n", ll->length);
-    print(ll);
-
-    return 0;
 }

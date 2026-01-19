@@ -52,6 +52,25 @@ void print(DoublyLinkedList* ll) {
     printf("]\n");
 }
 
+int front(DoublyLinkedList* ll) {
+
+    if (ll == NULL || ll->first == NULL) {
+        fprintf(stderr, "Fatal Error: Attempted to access front of an empty or NULL list.\n");
+        exit(EXIT_FAILURE);
+    }
+    return ll->first->data;
+}
+
+int back(DoublyLinkedList* ll) {
+
+    if (ll == NULL || ll->first == NULL) {
+        fprintf(stderr, "Fatal Error: Attempted to access back of an empty or NULL list.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    return ll->last->data;
+}
+
 void insert(DoublyLinkedList* ll, int index, int value)
 {
     Node *t, *p = ll->first;
@@ -212,6 +231,8 @@ int main() {
 
     printf("length is %d\n", ll->length);
     print(ll);
+
+    freeList(ll);
 
     return 0;
 }

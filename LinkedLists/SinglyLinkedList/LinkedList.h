@@ -6,7 +6,6 @@
 
 typedef struct Node {
 
-    struct Node *prev;
     int data;
     struct Node *next;
 } Node;
@@ -22,6 +21,10 @@ LinkedList* arrayToLinkedList(int* A, int size);
 
 void print(LinkedList* ll);
 
+int front(LinkedList* ll);
+
+int back(LinkedList* ll);
+
 void insert(LinkedList* ll, int index, int value);
 
 int erase(LinkedList* ll, int index);
@@ -29,8 +32,6 @@ int erase(LinkedList* ll, int index);
 void popFront(LinkedList* ll);
 
 void pushFront(LinkedList* ll, const int value);
-
-void popBack(LinkedList* ll);
 
 void pushBack(LinkedList* ll, const int value);
 

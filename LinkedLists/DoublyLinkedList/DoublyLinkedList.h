@@ -22,6 +22,10 @@ DoublyLinkedList* arrayToLinkedList(int* A, int size);
 
 void print(DoublyLinkedList* ll);
 
+int front(DoublyLinkedList* ll);
+
+int back(DoublyLinkedList* ll);
+
 void insert(DoublyLinkedList* ll, int index, int value);
 
 int erase(DoublyLinkedList* ll, int index);

@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 3.20)
-project(DataStructures)
+project(DataStructuresLab C)
 
 set(CMAKE_C_STANDARD 99)
+include_directories(include)
 
-set(LinkedList LinkedLists/SinglyLinkedList/LinkedList.c LinkedLists/SinglyLinkedList/LinkedList.h)
+file(GLOB_RECURSE LIB_SOURCES "src/*.c")
 
-set(InsertionSortLinked Sorting/InsertionSortLinked.c Sorting/headers/InsertionSortLinked.h)
+file(GLOB EXAMPLE_SOURCES "examples/*.c" "examples/*/*.c" "examples/*/*/*.c")
 
-add_executable(InsertionSortLinkedExec Sorting/InsertionSortLinked.c ${LinkedList})
-
-add_executable(BucketSortExec Sorting/BucketSort.c ${LinkedList} ${InsertionSortLinked})
-
-add_executable(RadixSortExec Sorting/RadixSort.c ${LinkedList})
+foreach(SOURCE_FILE ${EXAMPLE_SOURCES})
+    get_filename_component(EXE_NAME ${SOURCE_FILE} NAME_WE)
+    add_executable(${EXE_NAME} ${SOURCE_FILE} ${LIB_SOURCES})
+    target_include_directories(${EXE_NAME} PRIVATE include)
+endforeach()

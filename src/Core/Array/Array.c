@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "Core/Array.h"
+#include "Core/Array/Array.h"
 
 void printArray(const int* array, const int size) {
     for (int i = 0; i < size; i++) {

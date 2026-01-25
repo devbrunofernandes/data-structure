@@ -9,7 +9,7 @@
 */
 
 #include <stdlib.h>
-#include "Core/Array.h"
+#include "Core/Array/Array.h"
 #include "Algorithms/Sorting.h"
 
 void countSort(int* array, const int size) {

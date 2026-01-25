@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Core/LinkedLists/LinkedList.h"
-#include "Core/Array.h"
+#include "Core/Array/Array.h"
 #include "Algorithms/Sorting.h"
 
 static void radixPass(LinkedList* ll, LinkedList** bins, const int numericBase, const int divisor) {

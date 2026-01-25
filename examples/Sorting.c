@@ -1,5 +1,5 @@
 #include "Algorithms/Sorting.h"
-#include "Core/Array.h"
+#include "Core/Array/Array.h"
 
 #include <stdio.h>
 

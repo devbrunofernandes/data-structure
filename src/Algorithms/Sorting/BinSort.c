@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Core/LinkedLists/LinkedList.h"
-#include "Core/Array.h"
+#include "Core/Array/Array.h"
 #include "Algorithms/Sorting.h"
 
 void binSort(int* array, const int size) {

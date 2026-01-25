@@ -1,14 +1,20 @@
-#include "Core/Array.h"
+#include "Core/Array/Array.h"
+#include "Core/Array/Vector.h"
 
 #include <stdio.h>
 
-#define MAX_SIZE 20
-
 int main() {
-    int array[MAX_SIZE] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int currSize = 10;
+    Vector* v = createVector(20);
 
-    printf("Sum of array: %d\n", sumArray(array, currSize));
+    pushBackVector(v, 10);
+    pushBackVector(v, 20);
+    pushBackVector(v, 30);
+    pushBackVector(v, 40);
+    pushBackVector(v, 50);
+
+    popBackVector(v);
+
+    printArray(v->array, v->size);
 
     return 0;
 }

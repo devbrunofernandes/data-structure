@@ -1,6 +1,6 @@
 #include "Core/Heap.h"
 #include <stdio.h>
-#include "Core/Array.h"
+#include "Core/Array/Array.h"
 
 int main() {
     Heap* h = heapInitialize(10);

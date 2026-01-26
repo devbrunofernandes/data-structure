@@ -78,7 +78,7 @@ const int* llBack(LinkedList* ll) {
     return &(ll->last->data);
 }
 
-void llInsert(LinkedList* ll, int index, int value)
+void llInsert(LinkedList* ll, const int index, const int value)
 {
     LinkedListNode *t, *p = ll->first;
     
@@ -108,7 +108,7 @@ void llInsert(LinkedList* ll, int index, int value)
     ll->length++;
 }
 
-int llDelete(LinkedList* ll, int index)
+int llDelete(LinkedList* ll, const int index)
 {
     int x = -1;
     LinkedListNode* p = ll->first;
@@ -217,4 +217,63 @@ void llReverse(LinkedList* ll) {
     }
 
     ll->first = q;
+}
+
+int* llSearch(const LinkedList* ll, const int value) {
+    LinkedListNode* p = ll->first;
+
+    while (p) {
+        if (p->data == value)
+            return &(p->data);
+        p = p->next;
+    }
+
+    return NULL;
+}
+
+int* llSearchSorted(const LinkedList* ll, const int value) {
+    LinkedListNode* p = ll->first;
+
+    while (p) {
+        if (p->data == value)
+            return &(p->data);
+        if (p->data > value)
+            return NULL;
+        p = p->next;
+    }
+
+    return NULL;
+}
+
+bool llSearchDelete(LinkedList* ll, const int value) {
+    LinkedListNode* tail = NULL;
+    LinkedListNode* p = ll->first;
+
+    while (p) {
+        if (p->data == value && tail) {
+            if (p == ll->last)
+                ll->last = tail;
+            tail->next = p->next;
+            free(p);
+            return true;
+        }
+
+        if (p->data == value) {
+            if (p == ll->last)
+                ll->last = p->next;
+            ll->first = p->next;
+            free(p);
+            return true;
+        }
+
+        tail = p;
+        p = p->next;
+    }
+    return false;
+}
+
+bool llIsEmpty(const LinkedList* ll) {
+    if (ll->first == NULL) return true;
+
+    return false;
 }

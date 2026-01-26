@@ -1,6 +1,8 @@
 #ifndef SINGLY_LINKED_LIST
 #define SINGLY_LINKED_LIST
 
+#include <stdbool.h>
+
 typedef struct LinkedListNode {
     int data;
     struct LinkedListNode *next;
@@ -35,5 +37,13 @@ void llPushBack(LinkedList* ll, int value);
 void llDestroy(LinkedList* ll);
 
 void llReverse(LinkedList* ll);
+
+int* llSearch(const LinkedList* ll, int value);
+
+int* llSearchSorted(const LinkedList* ll, int value);
+
+bool llSearchDelete(LinkedList* ll, int value);
+
+bool llIsEmpty(const LinkedList* ll);
 
 #endif

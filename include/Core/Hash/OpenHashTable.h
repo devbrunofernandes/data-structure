@@ -1,24 +1,20 @@
-#ifndef DATASTRUCTURES_OPENHASHTABLE_H
-#define DATASTRUCTURES_OPENHASHTABLE_H
+#ifndef DATASTRUCTURES_OPEN_HASHTABLE_H
+#define DATASTRUCTURES_OPEN_HASHTABLE_H
 
-typedef unsigned int (*HashFunction)(int);
+typedef unsigned int (*OpenHashFunction)(int);
 
-typedef struct HashTable HashTable;
+typedef struct OpenHashTable OpenHashTable;
 
-HashTable* createHashTableSizeFunction(int maxSize, HashFunction function);
+OpenHashTable* createOpenHashTableWithFunction(OpenHashFunction function);
 
-HashTable* createHashTableWithFunction(HashFunction function);
+OpenHashTable* createOpenHashTable();
 
-HashTable* createHashTableWithSize(int size);
+void destroyOpenHashTable(OpenHashTable* ht);
 
-HashTable* createHashTable();
+void insertOpenHashTable(OpenHashTable* ht, int value);
 
-void destroyHashTable(HashTable* ht);
+const int* searchOpenHashTable(OpenHashTable* ht, int value);
 
-void insertHashTable(HashTable* ht, int value);
+void deleteOpenHashTable(OpenHashTable* ht, int value);
 
-const int* searchHashTable(HashTable* ht, int value);
-
-void deleteHashTable(HashTable* ht, int value);
-
-#endif //DATASTRUCTURES_OPENHASHTABLE_H
+#endif //DATASTRUCTURES_OPEN_HASHTABLE_H

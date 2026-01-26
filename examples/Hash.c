@@ -1,26 +1,27 @@
 #include <stdio.h>
 #include "Core/Hash/OpenHashTable.h"
+#include "Core/Hash/ClosedHashTable.h"
 
 
 int main() {
-    HashTable* ht = createHashTable();
+    ClosedHashTable* ht = createClosedHashTable();
 
-    insertHashTable(ht, 10);
-    insertHashTable(ht, 20);
-    insertHashTable(ht, 30);
-    insertHashTable(ht, 40);
-    insertHashTable(ht, 50);
-    insertHashTable(ht, 60);
+    insertClosedHashTable(ht, 10);
+    insertClosedHashTable(ht, 20);
+    insertClosedHashTable(ht, 30);
+    insertClosedHashTable(ht, 40);
+    insertClosedHashTable(ht, 50);
+    insertClosedHashTable(ht, 60);
 
-    if (searchHashTable(ht, 40))
+    if (searchClosedHashTable(ht, 40))
         printf("40 is in hash table\n");
     else
         printf("40 is not in hash table\n");
 
     printf("deleting 40...\n");
-    deleteHashTable(ht, 40);
+    deleteClosedHashTable(ht, 40);
 
-    if (searchHashTable(ht, 40))
+    if (searchClosedHashTable(ht, 40))
         printf("40 is in hash table\n");
     else
         printf("40 is not in hash table\n");

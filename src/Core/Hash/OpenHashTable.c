@@ -4,26 +4,50 @@
 
 #include "Core/Hash/OpenHashTable.h"
 
-typedef struct HashTable {
+#define INITIAL_PRIME_SIZE 31
+
+typedef struct OpenHashTable {
     LinkedList** table;
     int maxSize;
-    int currentSize;
-    HashFunction hashFunction;
-} HashTable;
+    int nonEmpty;
+    OpenHashFunction hashFunction;
+} OpenHashTable;
 
-static unsigned int defaultHashFunction(const int value) {
+static unsigned int defaultOpenHashFunction(const int value) {
     return value;
 }
 
-static unsigned int getIndex(const HashTable* ht, const int value) {
+static unsigned int getIndex(const OpenHashTable* ht, const int value) {
     return ht->hashFunction(value) % ht->maxSize;
 }
 
-static void resizeTable(HashTable* ht) {
-    if (ht->currentSize <= (ht->maxSize * 0.7)) return;
+static bool isPrime(const int n) {
+    if (n <= 1) return false;
+    if (n <= 3) return true;
+    if (n % 2 == 0 || n % 3 == 0) return false;
+
+    for (int i = 5; i * i <= n; i += 6) {
+        if (n % i == 0 || n % (i + 2) == 0) return false;
+    }
+    return true;
+}
+
+static int nextPrime(const int n) {
+    if (n <= 2) return 2;
+    int prime = n;
+    if (prime % 2 == 0) prime++;
+
+    while (!isPrime(prime)) {
+        prime += 2;
+    }
+    return prime;
+}
+
+static void resizeTable(OpenHashTable* ht) {
+    if (ht->nonEmpty <= (ht->maxSize * 0.7)) return;
 
     // memory allocation
-    const int newMaxSize = ht->maxSize * 2;
+    const int newMaxSize = nextPrime(ht->maxSize * 2);
     LinkedList** newTable = (LinkedList**)calloc(newMaxSize, sizeof(LinkedList*));
 
     if (!newTable) return;
@@ -52,28 +76,20 @@ static void resizeTable(HashTable* ht) {
     ht->table = newTable;
 }
 
-HashTable* createHashTableSizeFunction(const int maxSize, const HashFunction function) {
-    HashTable* ht = (HashTable*)malloc(sizeof(HashTable));
-    ht->maxSize = maxSize;
-    ht->currentSize = 0;
-    ht->table = (LinkedList**)calloc(maxSize, sizeof(LinkedList*));
+OpenHashTable* createOpenHashTableWithFunction(const OpenHashFunction function) {
+    OpenHashTable* ht = (OpenHashTable*)malloc(sizeof(OpenHashTable));
+    ht->maxSize = INITIAL_PRIME_SIZE;
+    ht->nonEmpty = 0;
+    ht->table = (LinkedList**)calloc(INITIAL_PRIME_SIZE, sizeof(LinkedList*));
     ht->hashFunction = function;
     return ht;
 }
 
-HashTable* createHashTableWithFunction(const HashFunction function) {
-    return createHashTableSizeFunction(31, function);
+OpenHashTable* createOpenHashTable() {
+    return createOpenHashTableWithFunction(defaultOpenHashFunction);
 }
 
-HashTable* createHashTableWithSize(const int size) {
-    return createHashTableSizeFunction(size, defaultHashFunction);
-}
-
-HashTable* createHashTable() {
-    return createHashTableSizeFunction(31, defaultHashFunction);
-}
-
-void destroyHashTable(HashTable* ht) {
+void destroyOpenHashTable(OpenHashTable* ht) {
     for (int i = 0; i < ht->maxSize; i++) {
         if (ht->table[i] != NULL)
             llDestroy(ht->table[i]);
@@ -83,7 +99,7 @@ void destroyHashTable(HashTable* ht) {
     free(ht);
 }
 
-void insertHashTable(HashTable* ht, const int value) {
+void insertOpenHashTable(OpenHashTable* ht, const int value) {
     const unsigned int index = getIndex(ht, value);
 
     if (ht->table[index] == NULL) {
@@ -92,13 +108,13 @@ void insertHashTable(HashTable* ht, const int value) {
 
     if (llSearch(ht->table[index], value) != NULL) return;
 
-    ht->currentSize++;
+    ht->nonEmpty++;
     llPushBack(ht->table[index], value);
 
     resizeTable(ht);
 }
 
-const int* searchHashTable(HashTable* ht, const int value) {
+const int* searchOpenHashTable(OpenHashTable* ht, const int value) {
     const unsigned int index = getIndex(ht, value);
 
     if (ht->table[index] == NULL)
@@ -107,11 +123,11 @@ const int* searchHashTable(HashTable* ht, const int value) {
     return llSearch(ht->table[index], value);
 }
 
-void deleteHashTable(HashTable* ht, const int value) {
+void deleteOpenHashTable(OpenHashTable* ht, const int value) {
     const unsigned int index = getIndex(ht, value);
 
     if (ht->table[index] == NULL) return;
 
     const bool deletionHappened = llSearchDelete(ht->table[index], value);
-    if (deletionHappened) ht->currentSize--;
+    if (deletionHappened) ht->nonEmpty--;
 }

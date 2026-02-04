@@ -1,18 +1,22 @@
 #ifndef DATASTRUCTURES_QUEUE_LINKED_H
 #define DATASTRUCTURES_QUEUE_LINKED_H
 
+#include <stdbool.h>
+
 typedef struct QueueLinked QueueLinked;
 
-QueueLinked* lqCreate();
+bool isEmptyLinkedQueue(const QueueLinked* q);
 
-void lqEnqueue(QueueLinked *q, int x);
+QueueLinked* createLinkedQueue();
 
-void lqDequeue(QueueLinked *q);
+void enqueueLinkedQueue(QueueLinked *q, int x);
 
-void lqDisplay(QueueLinked *q);
+void dequeueLinkedQueue(QueueLinked *q);
 
-const int* lqFront(QueueLinked *q);
+void displayLinkedQueue(QueueLinked *q);
 
-void lqDestroy(QueueLinked *q);
+const int* frontLinkedQueue(QueueLinked *q);
+
+void destroyLinkedQueue(QueueLinked *q);
 
 #endif //DATASTRUCTURES_QUEUE_LINKED_H

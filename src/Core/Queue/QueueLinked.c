@@ -11,40 +11,40 @@ typedef struct QueueLinked {
     int size;
 } QueueLinked;
 
-static bool isEmpty(QueueLinked* q) {
+bool isEmptyLinkedQueue(const QueueLinked* q) {
     if(q->size == 0)
         return true;
     return false;
 }
 
-void lqEnqueue(QueueLinked* q, int x) {
+void enqueueLinkedQueue(QueueLinked* q, const int x) {
     llPushBack(q->ll, x);
     q->size++;
 }
 
-void lqDequeue(QueueLinked* q) {
-    if(isEmpty(q)) return;
+void dequeueLinkedQueue(QueueLinked* q) {
+    if(isEmptyLinkedQueue(q)) return;
 
     llPopFront(q->ll);
     q->size--;
 }
 
-void lqDisplay(QueueLinked* q) {
+void displayLinkedQueue(QueueLinked* q) {
     llDisplay(q->ll);
 }
 
-const int* lqFront(QueueLinked *q) {
+const int* frontLinkedQueue(QueueLinked *q) {
     if (q->size == 0) return NULL;
 
     return llFront(q->ll);
 }
 
-void lqDestroy(QueueLinked *q) {
+void destroyLinkedQueue(QueueLinked *q) {
     llDestroy(q->ll);
     free(q);
 }
 
-QueueLinked* lqCreate() {
+QueueLinked* createLinkedQueue() {
     QueueLinked* q = (QueueLinked*) malloc(sizeof(QueueLinked));
     q->ll = llCreate();
     q->size = 0;

@@ -11,7 +11,6 @@ Vector* createVectorCapacity(const int capacity) {
     return v;
 }
 
-
 Vector* createVector() {
     return createVectorCapacity(50);
 }
@@ -33,7 +32,7 @@ void pushBackVector(Vector* v, const int value) {
 }
 
 void insertVector(Vector* v, const int index, const int value) {
-    if (index < 0 || index > v->size) return;
+    if (index < 0 || index >= v->capacity) return;
 
     if (v->capacity == v->size) resizeVector(v);
 

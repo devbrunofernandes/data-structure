@@ -5,19 +5,30 @@
 #include "Core/Trees/RadixTree.h"
 #include "Core/Trees/Trie.h"
 #include "Core/Trees/RBT.h"
+#include "Core/Trees/SegmentTree.h"
 
 #include <stdio.h>
 
 int main() {
-    Trie* tree= trieCreate();
+    const int array[] = {2, 4, 6, 8, 9, 10, 4, 9, 0};
 
-    trieInsert(tree, "test");
+    SegTree* tree= segTreeCreate(array, 9);
 
-    trieSearch(tree, "test") ? printf("Test in trie\n") : printf("Test not in trie\n");
+    printf("0-8 -> %d\n", segTreeQuery(tree, 0, 8));
 
-    trieDelete(tree, "test");
+    printf("3-5 -> %d\n", segTreeQuery(tree, 3, 5));
 
-    trieSearch(tree, "test") ? printf("Test in trie\n") : printf("Test not in trie\n");
+    printf("7-8 -> %d\n", segTreeQuery(tree, 7, 8));
+
+    printf("updating tree at index 4 to value 10\n");
+
+    segTreeUpdate(tree, 4, 10);
+
+    printf("3-5 -> %d\n", segTreeQuery(tree, 3, 5));
+
+    printf("0-8 -> %d\n", segTreeQuery(tree, 0, 8));
+
+    segTreeDestroy(tree);
 
     return 0;
 }
